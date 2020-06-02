@@ -1,0 +1,88 @@
+service: aire-twilio-service
+
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-2
+  environment:
+    APPOINTMENT_TABLE: ${self:service}-${opt:stage, self:provider.stage}-appointments    
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource: "*"
+
+functions:
+  getToken:
+    handler: api/service.getToken
+    memorySize: 128
+    description: gets a twilio token for video.
+    events:
+      - http: 
+          path: token
+          method: get
+          cors:
+            origin: '*'
+            headers: '*' 
+
+  createSlot:
+    handler: api/service.createSlot
+    memorySize: 128
+    description: creates a slot.
+    events:
+      - http: 
+          path: slot
+          method: post
+          cors: true 
+
+  getSlots:
+    handler: api/service.getSlots
+    memorySize: 128
+    description: gets a list of slots and states.
+    events:
+      - http: 
+          path: slots
+          method: get
+          cors: true
+
+  updateSlot:
+    handler: api/service.updateSlotStatus
+    memorySize: 128
+    description: update slot status.
+    events:
+      - http: 
+          path: slot/hooks/update
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    AppointmentsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: "ServiceId"
+            AttributeType: "S"   
+          -
+            AttributeName: "Slot"
+            AttributeType: "S"
+        KeySchema:
+          -
+            AttributeName: "ServiceId"
+            KeyType: "HASH"
+          -
+            AttributeName: "Slot"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.APPOINTMENT_TABLE}
