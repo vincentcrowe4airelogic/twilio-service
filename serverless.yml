@@ -17,11 +17,13 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
+        - ssm:GetParameter
+        - ssm:GetParameters
       Resource: "*"
 
 functions:
   getToken:
-    handler: api/service.getToken
+    handler: api/slotService.getToken
     memorySize: 128
     description: gets a twilio token for video.
     events:
@@ -33,7 +35,7 @@ functions:
             headers: '*' 
 
   createSlot:
-    handler: api/service.createSlot
+    handler: api/slotService.createSlot
     memorySize: 128
     description: creates a slot.
     events:
@@ -43,7 +45,7 @@ functions:
           cors: true 
 
   getSlots:
-    handler: api/service.getSlots
+    handler: api/slotService.getSlots
     memorySize: 128
     description: gets a list of slots and states.
     events:
@@ -53,7 +55,7 @@ functions:
           cors: true
 
   updateSlot:
-    handler: api/service.updateSlotStatus
+    handler: api/slotService.updateSlotStatus
     memorySize: 128
     description: update slot status.
     events:
