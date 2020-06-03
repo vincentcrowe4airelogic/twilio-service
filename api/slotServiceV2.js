@@ -53,9 +53,9 @@ module.exports.getToken = async (event, context, callback) => {
   callback(null, response);
 };
 
-module.exports.createSlot = (event, context, callback) => {
+module.exports.createSlot = async (event, context, callback) => {
   const requestBody = JSON.parse(event.body);
-  const slotId = insertAppointment(requestBody.subjectName, requestBody.hostName);
+  const slotId = await insertAppointment(requestBody.subjectName, requestBody.hostName);
   const response = {
     statusCode: 201,
     headers: {
@@ -95,7 +95,9 @@ module.exports.updateSlotStatus = async (event, context, callback) => {
   const roomName = requestData["RoomName"];
   const action = requestData["ParticipantStatus"];
 
-  if (participant != roomName)
+  const slotInfo = await getSlotInfo(roomName);
+
+  if (participant != slotInfo.SubjectName)
     callback(null, {
       statusCode: 204,
       headers: {
@@ -138,7 +140,7 @@ const insertAppointment = async (subjectName, hostName) => {
     }
   };
   
-  await dynamoDB.putItem(params).promise();
+  await dynamoDB.putItem(params).promise();  
   return slotId;
 }
 
