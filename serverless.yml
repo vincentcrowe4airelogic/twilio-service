@@ -22,6 +22,49 @@ provider:
       Resource: "*"
 
 functions:
+
+  getTokenV2:
+    handler: api/slotServiceV2.getToken
+    memorySize: 128
+    description: get twilio token and slot info
+    events:
+      - http:
+          path: v2/token
+          method: get
+          cors:
+            origin: '*'
+            headers: '*'
+
+  createSlotV2:
+    handler: api/slotServiceV2.createSlot
+    memorySize: 128
+    description: create a slot for a subject and host
+    events:
+      - http:
+          path: v2/slot
+          method: post
+          cors: true
+  
+  getSlotsV2:
+    handler: api/slotServiceV2.getSlots
+    memorySize: 128
+    description: gets a list of slots and states.
+    events:
+      - http: 
+          path: slots
+          method: get
+          cors: true
+
+  updateSlotV2:
+    handler: api/slotServiceV2.updateSlotStatus
+    memorySize: 128
+    description: update slot status.
+    events:
+      - http: 
+          path: slot/hooks/update
+          method: post
+          cors: true
+
   getToken:
     handler: api/slotService.getToken
     memorySize: 128
@@ -62,6 +105,16 @@ functions:
       - http: 
           path: slot/hooks/update
           method: post
+          cors: true
+    
+  getPatient:
+    handler: api/patientService.getPatient
+    memorySize: 128
+    description: get patient details.
+    events:
+      - http:
+          path: /patient
+          method: get
           cors: true
 
 resources:
