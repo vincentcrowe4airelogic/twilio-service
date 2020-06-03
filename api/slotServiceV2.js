@@ -167,9 +167,10 @@ const getAppointments = async () => {
       "#st": "State"
     },
     ExpressionAttributeValues: {
+        ':serviceId' : serviceID,
         ':slot': 'slot:'
     },
-    KeyConditionExpression: 'begins_with(Slot, :slot)',
+    KeyConditionExpression: 'ServiceId = :serviceId and begins_with(Slot, :slot)',
     ProjectionExpression: 'Slot, SubjectName, HostName, #st',    
     TableName: process.env.APPOINTMENT_TABLE
   };
@@ -179,13 +180,13 @@ const getAppointments = async () => {
 
 const scan = async (params) => {
 
-  const { Items, LastEvaluatedKey } = await dynamoDB.scan(params).promise();
+  const { Items, LastEvaluatedKey } = await docClient.query(params).promise();
   
   const thisData = Items.map(i => ({
-      SlotId: i.Slot.S.replace("slot:", ""),
-      SubjectName: i.SubjectName.S,
-      HostName: i.HostName.S,
-      State: i.State.S
+      SlotId: i.Slot.replace("slot:", ""),
+      SubjectName: i.SubjectName,
+      HostName: i.HostName,
+      State: i.State
     }))
 
   let nextData = []

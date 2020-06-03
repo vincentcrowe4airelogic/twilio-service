@@ -51,7 +51,7 @@ functions:
     description: gets a list of slots and states.
     events:
       - http: 
-          path: slots
+          path: v2/slots
           method: get
           cors: true
 
@@ -61,7 +61,7 @@ functions:
     description: update slot status.
     events:
       - http: 
-          path: slot/hooks/update
+          path: v2/slot/hooks/update
           method: post
           cors: true
 
